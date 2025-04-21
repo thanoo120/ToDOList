@@ -2,66 +2,126 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  TextInput,
   FlatList,
   StyleSheet,
-  Alert,
   TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { Task } from '../types/Task';
-import { TaskCard } from '../components/TaskCard';
-import { AddTaskModal } from '../components/AddTaskModal';
+import TaskItem from '../components/TaskItem';
 
-export const HomeScreen = () => {
-  const tasks = useTaskStore((state) => state.tasks);
-  const deleteTask = useTaskStore((state) => state.deleteTask);
-  const [modalVisible, setModalVisible] = useState(false);
+const HomeScreen = () => {
+  const { tasks, addTask } = useTaskStore();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
-  const handleDelete = (id: string) => {
-    Alert.alert('Delete this task?', 'Are you sure?', [
-      { text: 'No', style: 'cancel' },
-      { text: 'Yes', onPress: () => deleteTask(id) },
-    ]);
+  const handleAddTask = () => {
+    if (!title.trim()) {
+      Alert.alert('Missing Title', 'Please enter a task title.');
+      return;
+    }
+
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      description: description.trim(),
+      completed: false,
+      createdAt: 0
+    };
+
+    addTask(newTask);
+    setTitle('');
+    setDescription('');
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>To Do List</Text>
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.addButton}>
-          <Text style={styles.plus}>+</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* Input and Add button row */}
+      <View style={styles.inputRow}>
+        <View style={styles.inputFields}>
+          <TextInput
+            style={styles.input}
+            placeholder="Title..."
+            placeholderTextColor="#FF8303"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="About..."
+            placeholderTextColor="#FF8303"
+            value={description}
+            onChangeText={setDescription}
+          />
+        </View>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
+          <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Task list or No tasks message */}
       {tasks.length === 0 ? (
-        <Text style={styles.noTasks}>No tasks</Text>
+        <Text style={styles.noTasksText}>No tasks</Text>
       ) : (
         <FlatList
           data={tasks}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TaskCard task={item} onDelete={() => handleDelete(item.id)} />
-          )}
+          renderItem={({ item }) => <TaskItem task={item} />}
+          contentContainerStyle={{ paddingBottom: 100 }}
         />
       )}
-
-      <AddTaskModal visible={modalVisible} onClose={() => setModalVisible(false)} />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1B1A17', padding: 20 },
-  header: { flexDirection: 'row', justifyContent: 'space-between' },
-  title: { color: '#F0E3CA', fontSize: 24 },
+  container: {
+    flex: 1,
+    backgroundColor: '#1B1A17',
+    padding: 20,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    marginBottom: 20,
+  },
+  inputFields: {
+    flex: 1,
+    marginRight: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#FF8303',
+    borderRadius: 8,
+    padding: 10,
+    color: '#F0E3CA',
+    marginBottom: 10,
+  },
   addButton: {
     backgroundColor: '#FF8303',
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    width: 50,
+    borderRadius: 8,
   },
-  plus: { fontSize: 24, color: '#1B1A17' },
-  noTasks: { color: '#F0E3CA', textAlign: 'center', marginTop: 50, fontSize: 16 },
+  addButtonText: {
+    color: '#1B1A17',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  noTasksText: {
+    color: '#F0E3CA',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
+
+export default HomeScreen;

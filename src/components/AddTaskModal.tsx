@@ -27,6 +27,7 @@ export const AddTaskModal = ({ visible, onClose }: Props) => {
       title,
       description,
       completed: false,
+      createdAt: Date.now(),
     };
     addTask(task);
     setTitle('');

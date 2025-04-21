@@ -4,6 +4,7 @@ import { Task } from '../types/Task';
 import { persist } from 'zustand/middleware';
 
 type TaskStore = {
+  [x: string]: any;
   tasks: Task[];
   addTask: (task: Task) => void;
   deleteTask: (id: string) => void;
