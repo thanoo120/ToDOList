@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { useTaskStore } from '../store/useTaskStore';
 import { Task } from '../types/Task';
@@ -62,21 +63,33 @@ const HomeScreen = () => {
           />
         </View>
         <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
+  <Image
+    source={require('../images/add.png')}
+    style={styles.addIcon}
+    resizeMode="contain"
+  />
+</TouchableOpacity>
+
       </View>
 
       {/* Task list or No tasks message */}
       {tasks.length === 0 ? (
-        <Text style={styles.noTasksText}>No tasks</Text>
-      ) : (
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <TaskItem task={item} />}
-          contentContainerStyle={{ paddingBottom: 100 }}
-        />
-      )}
+  <View style={styles.emptyContainer}>
+    <Image
+      source={require('../images/notask.png')}
+      style={styles.emptyImage}
+      resizeMode="contain"
+    />
+  </View>
+) : (
+  <FlatList
+    data={tasks}
+    keyExtractor={(item) => item.id}
+    renderItem={({ item }) => <TaskItem task={item} />}
+    contentContainerStyle={{ paddingBottom: 100 }}
+  />
+)}
+
     </KeyboardAvoidingView>
   );
 };
@@ -116,6 +129,23 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  addIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#1B1A17', // Optional for coloring icons
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 50,
+  },
+  emptyImage: {
+    width: 200,
+    height: 200,
+    opacity: 0.6,
+  },
+  
   noTasksText: {
     color: '#F0E3CA',
     fontSize: 16,
