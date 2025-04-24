@@ -20,6 +20,10 @@ const HomeScreen = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
+  const activeTasks = tasks.filter((task) => !task.completed);
+  const finishedTasks = tasks.filter((task) => task.completed);
+
+
   const handleAddTask = () => {
     if (!title.trim()) {
       Alert.alert('Missing Title', 'Please enter a task title.');
@@ -31,7 +35,7 @@ const HomeScreen = () => {
       title: title.trim(),
       description: description.trim(),
       completed: false,
-      createdAt: 0
+      createdAt: Date.now()
     };
 
     addTask(newTask);
@@ -44,7 +48,7 @@ const HomeScreen = () => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Input and Add button row */}
+      
       <View style={styles.inputRow}>
         <View style={styles.inputFields}>
           <TextInput
@@ -63,33 +67,34 @@ const HomeScreen = () => {
           />
         </View>
         <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
-  <Image
-    source={require('../images/add.png')}
-    style={styles.addIcon}
-    resizeMode="contain"
-  />
-</TouchableOpacity>
-
-      </View>
-
-      {/* Task list or No tasks message */}
-      {tasks.length === 0 ? (
-  <View style={styles.emptyContainer}>
-    <Image
-      source={require('../images/notask.png')}
-      style={styles.emptyImage}
-      resizeMode="contain"
+          <Text style={styles.addButtonText}>+</Text>
+        </TouchableOpacity>
+      </View> 
+      <View style={{ flex: 1 }}>
+ 
+  <Text style={styles.sectionHeader}>Active Tasks</Text>
+  {activeTasks.length === 0 ? (
+    <Text style={styles.noTasksText}>No active tasks</Text>
+  ) : (
+    <FlatList
+      data={activeTasks}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => <TaskItem task={item} />}
     />
-  </View>
-) : (
-  <FlatList
-    data={tasks}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }) => <TaskItem task={item} />}
-    contentContainerStyle={{ paddingBottom: 100 }}
-  />
-)}
+  )}
 
+ 
+  {finishedTasks.length > 0 && (
+    <>
+      <Text style={styles.sectionHeader}>Finished Tasks</Text>
+      <FlatList
+        data={finishedTasks}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <TaskItem task={item} />}
+      />
+    </>
+  )}
+</View>
     </KeyboardAvoidingView>
   );
 };
@@ -123,7 +128,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 50,
     borderRadius: 8,
+    height: 95,
   },
+  sectionHeader: {
+    color: '#FF8303',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  
   addButtonText: {
     color: '#1B1A17',
     fontSize: 24,
@@ -132,7 +146,7 @@ const styles = StyleSheet.create({
   addIcon: {
     width: 24,
     height: 24,
-    tintColor: '#1B1A17', // Optional for coloring icons
+    tintColor: '#1B1A17', 
   },
   emptyContainer: {
     flex: 1,

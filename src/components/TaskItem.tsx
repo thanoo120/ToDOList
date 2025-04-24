@@ -34,7 +34,7 @@ const TaskItem: React.FC<Props> = ({ task }) => {
 
   const handleSave = () => {
     if (editTitle.trim()) {
-      updateTask(task.id, editTitle, editDescription);
+      updateTask(task.id, editTitle.trim(), editDescription.trim());
       setShowEditModal(false);
     }
   };
@@ -68,6 +68,12 @@ const TaskItem: React.FC<Props> = ({ task }) => {
           <Image source={require('../images/close.png')} style={styles.iconImage} />
         </TouchableOpacity>
       </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.completeButton}
+  onPress={() => useTaskStore.getState().toggleComplete(task.id)}
+>
+  <Text style={styles.completeIcon}>{task.completed ? '✅' : '☐'}</Text>
+</TouchableOpacity>
 
       {/* Action Icons */}
       {expanded && (
@@ -85,29 +91,45 @@ const TaskItem: React.FC<Props> = ({ task }) => {
       )}
 
       {showShareOptions && (
-  <View style={styles.shareBar}>
-    <TouchableOpacity onPress={() => handleShare('Copy')}>
-      <Image source={require('../images/copy.png')} style={styles.shareIcon} />
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => handleShare('VK')}>
-      <Image source={require('../images/vk.png')} style={styles.shareIcon} />
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => handleShare('Telegram')}>
-      <Image source={require('../images/telegram.png')} style={styles.shareIcon} />
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => handleShare('WhatsApp')}>
-      <Image source={require('../images/whatsapp.png')} style={styles.shareIcon} />
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => handleShare('Facebook')}>
-      <Image source={require('../images/facebook.png')} style={styles.shareIcon} />
-    </TouchableOpacity>
+  <Modal
+  transparent
+  visible={showShareOptions}
+  animationType="slide"
+  onRequestClose={() => setShowShareOptions(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.shareModalBox}>
+      <View style={styles.shareIconRow}>
+        <TouchableOpacity onPress={() => handleShare('Copy')}>
+          <Image source={require('../images/copy.png')} style={styles.shareIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleShare('VK')}>
+          <Image source={require('../images/vk.png')} style={styles.shareIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleShare('Telegram')}>
+          <Image source={require('../images/telegram.png')} style={styles.shareIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleShare('WhatsApp')}>
+          <Image source={require('../images/whatsapp.png')} style={styles.shareIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleShare('Facebook')}>
+          <Image source={require('../images/facebook.png')} style={styles.shareIcon} />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.modalCancelButton} onPress={() => setShowShareOptions(false)}>
+        <Text style={styles.modalButtonText}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
   </View>
+</Modal>
+
 )}
 
 
       {showInfo && <Text style={styles.infoText}>Created: {formattedDate}</Text>}
 
-      {/* Delete Confirmation Modal */}
+      
       <Modal
         transparent
         visible={showDeleteModal}
@@ -178,28 +200,32 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#1F1E1B',
     borderRadius: 8,
-    padding: 12,
-    paddingRight: 38,
+    paddingVertical: 12,
+    paddingLeft: 38, 
+    paddingRight: 38, 
     borderWidth: 1.2,
     borderColor: '#FF8303',
     position: 'relative',
-    marginBottom: 4,
+    marginBottom: 8,
   },
+  
   title: {
     fontSize: 16,
     fontWeight: '600',
     color: '#F0E3CA',
+    marginRight: 10,
   },
   description: {
     fontSize: 13,
     color: '#F0E3CA',
     marginTop: 4,
+    marginRight: 10,
   },
+  
   deleteButton: {
     position: 'absolute',
     right: 8,
-    top: 8,
-    padding: 4,
+    top: 12,
   },
   actionBox: {
     flexDirection: 'row',
@@ -214,19 +240,43 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FF8303',
   },
-  shareBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+  shareModalBox: {
     backgroundColor: '#1F1E1B',
-    borderTopWidth: 1,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
     borderColor: '#FF8303',
-    paddingVertical: 12,
+    borderWidth: 1,
+    width: '100%',
     position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
   },
+  completeButton: {
+    position: 'absolute',
+    left: 8,
+    top: 12,
+  },
+  completeIcon: {
+    fontSize: 18,
+    color: '#FF8303',
+  },
+  shareIconRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modalCancelButton: {
+    alignSelf: 'center',
+    backgroundColor: '#2C2B29',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FF8303',
+    marginTop: 10,
+  },
+  
   shareIcon: {
     width: 28,
     height: 28,
@@ -234,8 +284,8 @@ const styles = StyleSheet.create({
   },
   
   iconImage: {
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 20,
     resizeMode: 'contain',
   },
   infoText: {

@@ -22,7 +22,7 @@ export const TaskCard = ({ task, onDelete }: Props) => {
           <Text style={styles.actionBtn}>✓</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onDelete}>
-          <Text style={[styles.actionBtn, { color: '#FF8303' }]}>🗑</Text>
+          <Text style={[styles.actionBtn, { color: '#FF8303' }]}>x</Text>
         </TouchableOpacity>
       </View>
     </View>

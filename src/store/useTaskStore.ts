@@ -4,11 +4,11 @@ import { Task } from '../types/Task';
 import { persist } from 'zustand/middleware';
 
 type TaskStore = {
-  [x: string]: any;
   tasks: Task[];
   addTask: (task: Task) => void;
   deleteTask: (id: string) => void;
   toggleComplete: (id: string) => void;
+  updateTask: (id: string, title: string, description: string) => void; 
 };
 
 export const useTaskStore = create<TaskStore>()(
@@ -25,6 +25,14 @@ export const useTaskStore = create<TaskStore>()(
         set((state) => ({
           tasks: state.tasks.map((task) =>
             task.id === id ? { ...task, completed: !task.completed } : task
+          ),
+        })),
+      updateTask: (id, title, description) => 
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === id
+              ? { ...task, title, description }
+              : task
           ),
         })),
     }),
@@ -45,5 +53,5 @@ export const useTaskStore = create<TaskStore>()(
     }
   )
 );
-export type { Task };
 
+export type { Task };
